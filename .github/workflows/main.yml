@@ -1,16 +1,36 @@
-try
- {
-     //this line of code locates the audio in the folder and combines it with the base directory of the program to create the full path to the audio file
-     string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AudioPlayer", "greeting.wav");
-     //i used an If statment that if the audio is found it should play it, else it will print the error message in read 
-     if (File.Exists(path))
-     {
-         SoundPlayer player = new SoundPlayer(path);
-         player.PlaySync();
-     }
-     else
-     {
-         Console.ForegroundColor = ConsoleColor.Red;
-         Console.WriteLine("[Voice greeting file not found - continuing without audio]");
-         Console.ResetColor();
-     }
+name: CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18, 20]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build --if-present
