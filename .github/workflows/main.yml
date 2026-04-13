@@ -1,36 +1,11 @@
-name: CI
+- name: Install dependencies
+  run: npm install
+  working-directory: ./client
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+- name: Run tests
+  run: npm test --if-present
+  working-directory: ./client
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18, 20]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run lint (optional)
-        run: npm run lint --if-present
-
-      - name: Run tests (optional)
-        run: npm test --if-present
-
-      - name: Build (optional)
-        run: npm run build --if-present
+- name: Build
+  run: npm run build --if-present
+  working-directory: ./client
